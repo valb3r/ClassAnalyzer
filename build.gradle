@@ -1,0 +1,49 @@
+group 'com.helpers.classrelationship'
+version '1.0.0-SNAPSHOT'
+
+apply plugin: 'groovy'
+apply plugin: 'java'
+
+sourceCompatibility = 1.9
+
+def deps = [
+]
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.4.11'
+    compile 'com.google.guava:guava:23.0'
+    compile 'org.yaml:snakeyaml:1.18'
+    compile 'org.codehaus.gpars:gpars:1.2.1'
+    compile 'commons-io:commons-io:2.6'
+    compile 'org.apache.bcel:bcel:6.1'
+    compile 'org.neo4j:neo4j:3.3.0'
+}
+
+task analyzeJars (dependsOn: 'classes', type: JavaExec) {
+    //jvmArgs "-Xmx6G"
+	
+    description "Generates inter-application class relationship based on jar to application mapping and pushes it into neo4j db" +
+            " -PappMap ;-separated list of directories with jars to analyze in format path=ProductName, i.e. /opt/project1/lib1,/opt/project1/lib2=Project1;/opt/project2/lib=Project2,\n" +
+            " -PclassInclude regex for class package to include in analysis (class entities and class-level relationship)\n" +
+            " -PclassExclude - regex for class package to exclude in analysis (class entities and class-level relationship)\n" +
+            " -PmethodInclude - regex for class package to include in METHOD BODY analysis (detects calls from a method to external/this class)\n" +
+            " -PmethodExclude - regex for class package to exclude in METHOD BODY analysis (detects calls from a method to external/this class)\n" +
+            " -PdbFile - db file path"
+
+    main = 'com.helpers.classrelationship.Analyzer'
+
+    classpath = sourceSets.main.runtimeClasspath
+
+    args(
+            project.findProperty("appMap") ?: "",
+            project.findProperty("classInclude") ?: ".*",
+            project.findProperty("classExclude") ?: "NOT_MATCHED",
+            project.findProperty("methodInclude") ?: ".*",
+            project.findProperty("methodExclude") ?: "NOT_MATCHED",
+            project.findProperty("dbFile") ?: ""
+    )
+}
