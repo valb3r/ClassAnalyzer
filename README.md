@@ -14,7 +14,7 @@ compiled its jars into following folders:
 
 To analyze its relationships (in this project root folder) execute cmd:
 
-    ./gradlew  -PappMap="/opt/projectA/lib1,/opt/projectA/lib2=ProjectA;/opt/projectB/libs=ProjectB" \
+    ./gradlew analyzeJars -PappMap="/opt/projectA/lib1,/opt/projectA/lib2=ProjectA;/opt/projectB/libs=ProjectB" \
     -PclassInclude="com\..*|org\..*"  \ 
     -PmethodInclude="com\..*|org\..*" \
     -PdbFile="/home/user/project.graphb"
