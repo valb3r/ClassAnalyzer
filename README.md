@@ -20,3 +20,6 @@ To analyze its relationships (in this project root folder) execute cmd:
     -PdbFile="/home/user/project.graphb"
 
 Script will generate class relationship data in /home/user/project.graphb
+
+TODO:
+Reduce memory usage by streaming class processing (JavaClass) so they won't get stored in cache
