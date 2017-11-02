@@ -2,7 +2,7 @@ package com.helpers.classrelationship.neo4j.persistor.calls
 
 import com.helpers.classrelationship.analysis.ClassFileAnalyzer
 import com.helpers.classrelationship.analysis.ClassRegistry
-import com.helpers.classrelationship.analysis.MethodAnalyzer
+import com.helpers.classrelationship.analysis.method.MethodAnalyzer
 import com.helpers.classrelationship.analysis.MethodRegistry
 import com.helpers.classrelationship.neo4j.CodeRelationships
 import com.helpers.classrelationship.neo4j.persistor.entity.Constants
@@ -50,7 +50,7 @@ class MethodCallPersistor {
         analyzer.get().getMethods().toList().each {
             def methodCalls = []
             try {
-                methodCalls = new MethodAnalyzer(methodRegistry, analyzer, it).getMethodCalls()
+                methodCalls = new MethodAnalyzer(methodRegistry, analyzer, it).analyze()
             } catch (ex) {
                 println "Caught exception analyzing method ${it.name} of ${clazz.assignedClass.className} - $ex"
             }
