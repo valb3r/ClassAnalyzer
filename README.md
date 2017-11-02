@@ -21,5 +21,7 @@ To analyze its relationships (in this project root folder) execute cmd:
 
 Script will generate class relationship data in /home/user/project.graphb
 
+Helpful queries:
+
 TODO:
 Reduce memory usage by streaming class processing (JavaClass) so they won't get stored in cache
