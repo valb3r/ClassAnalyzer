@@ -1,6 +1,6 @@
 # Cypher queries sample
 
-**Virtual class level relationship tree**
+**A-C class level path. Class A can possibly modify state of class C by calling B (virtual class level relationship tree)**
 
     MATCH p = (s:Class)-[:Has]->(m:Method)-[:Calls*7..7]->(em:Method)<-[:Has]-(e:Class) WHERE e.simpleName = 'RateRule' AND s <> e 
     WITH EXTRACT(r IN RELATIONSHIPS(p)| ID(r)) AS relIds
@@ -10,7 +10,7 @@
     RETURN o, d, rel
 
 
-**Class-method call chain relationship (Start/End class, method calls in between):**
+**A-C method level path. Class A can possibly modify state of class C through A.call() -> B.callD() -> C.callMe() class-method call chain relationship (Start/End class, method calls in between):**
 
     MATCH p = (s:Class)-[:Has]->(m:Method)-[:Calls*7..7]->(em:Method)<-[:Has]-(e:Class) WHERE e.simpleName = 'RateRule' AND s <> e 
     WITH COLLECT(p) AS nodes

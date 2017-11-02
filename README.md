@@ -21,7 +21,8 @@ To analyze its relationships (in this project root folder) execute cmd:
 
 Script will generate class relationship data in /home/user/project.graphb
 
-Helpful queries:
+**Helpful cypher queries:**
+[Are here](https://github.com/valb3r/ClassAnalyzer/blob/master/help/CYPHER.md)
 
 TODO:
 Reduce memory usage by streaming class processing (JavaClass) so they won't get stored in cache
