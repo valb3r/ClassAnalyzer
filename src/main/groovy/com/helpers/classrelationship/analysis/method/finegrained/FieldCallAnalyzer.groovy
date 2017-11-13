@@ -8,8 +8,8 @@ import org.apache.bcel.generic.GETSTATIC
 import org.apache.bcel.generic.ObjectType
 import org.apache.bcel.generic.PUTFIELD
 import org.apache.bcel.generic.PUTSTATIC
-import org.apache.bcel.generic.ReferenceType;
-import org.apache.bcel.generic.Type;
+import org.apache.bcel.generic.ReferenceType
+import org.apache.bcel.generic.Type
 
 class FieldCallAnalyzer extends FieldOrMethodAnalyzer<FieldCallDto, FieldInstruction> {
 

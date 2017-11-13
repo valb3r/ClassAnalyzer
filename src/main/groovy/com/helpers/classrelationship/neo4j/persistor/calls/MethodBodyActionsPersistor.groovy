@@ -6,11 +6,13 @@ import com.helpers.classrelationship.analysis.ClassFileAnalyzer
 import com.helpers.classrelationship.analysis.ClassRegistry
 import com.helpers.classrelationship.analysis.ClassRegistry.MethodKey
 import com.helpers.classrelationship.analysis.method.MethodAnalyzer
+import com.helpers.classrelationship.analysis.method.finegrained.ClassNameReferenceAnalyzer
 import com.helpers.classrelationship.analysis.method.finegrained.ExternalCallAnalyzer
 import com.helpers.classrelationship.analysis.method.finegrained.FieldCallAnalyzer
 import com.helpers.classrelationship.analysis.method.finegrained.InMethodBodyAction
 import com.helpers.classrelationship.neo4j.persistor.AbstractPersistor
 import com.helpers.classrelationship.neo4j.persistor.AbstractPersistor.PersistStage
+import com.helpers.classrelationship.neo4j.persistor.calls.clazz.NameReferencerPersistor
 import com.helpers.classrelationship.neo4j.persistor.calls.external.ExternalCallPersistor
 import com.helpers.classrelationship.neo4j.persistor.calls.fields.FieldsCallPersistor
 import org.neo4j.unsafe.batchinsert.BatchInserter
@@ -41,6 +43,7 @@ class MethodBodyActionsPersistor extends AbstractPersistor<String, ClassRegistry
         private final Map<Class, AbstractInMethodActionPersistor> dispatchers = ImmutableMap.builder()
                 .put(ExternalCallAnalyzer.ExternalMethodCallDto.class, new ExternalCallPersistor(inserter, classes))
                 .put(FieldCallAnalyzer.FieldCallDto.class, new FieldsCallPersistor(inserter, classes))
+                .put(ClassNameReferenceAnalyzer.ClassNameReferenceDto.class, new NameReferencerPersistor(inserter, classes))
                 .build()
 
         Persistor(String name, BatchInserter batchInserter, ClassRegistry classes) {
