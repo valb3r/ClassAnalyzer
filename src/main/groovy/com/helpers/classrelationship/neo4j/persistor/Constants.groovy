@@ -47,4 +47,9 @@ class Constants {
             static final String TYPE = "type"
         }
     }
+
+    class StaticReference {
+
+        static final String CALL_COUNT = "count"
+    }
 }

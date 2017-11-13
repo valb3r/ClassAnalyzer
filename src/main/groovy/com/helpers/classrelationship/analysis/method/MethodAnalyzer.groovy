@@ -2,6 +2,7 @@ package com.helpers.classrelationship.analysis.method
 
 import com.google.common.collect.ImmutableMap
 import com.helpers.classrelationship.analysis.ClassFileAnalyzer
+import com.helpers.classrelationship.analysis.method.finegrained.ClassNameReferenceAnalyzer
 import com.helpers.classrelationship.analysis.method.finegrained.InMethodBodyAction
 import com.helpers.classrelationship.analysis.method.finegrained.ExternalCallAnalyzer
 import com.helpers.classrelationship.analysis.method.finegrained.FieldCallAnalyzer
@@ -11,6 +12,7 @@ import org.apache.bcel.generic.FieldInstruction
 import org.apache.bcel.generic.Instruction
 import org.apache.bcel.generic.InstructionList
 import org.apache.bcel.generic.InvokeInstruction
+import org.apache.bcel.generic.LDC
 import org.apache.bcel.generic.MethodGen
 
 class MethodAnalyzer {
@@ -21,6 +23,7 @@ class MethodAnalyzer {
     private final Map<Class, InstructionAnalyzer> dispatchers = ImmutableMap.builder()
             .put(InvokeInstruction.class, new ExternalCallAnalyzer(classAnalyzer))
             .put(FieldInstruction.class, new FieldCallAnalyzer(classAnalyzer))
+            .put(LDC.class, new ClassNameReferenceAnalyzer(classAnalyzer))
             .build()
 
     MethodAnalyzer(ClassFileAnalyzer classAnalyzer, Method method) {

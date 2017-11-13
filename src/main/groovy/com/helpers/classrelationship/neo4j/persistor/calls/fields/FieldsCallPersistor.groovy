@@ -7,8 +7,8 @@ import com.helpers.classrelationship.neo4j.CodeRelationships
 import com.helpers.classrelationship.neo4j.persistor.Constants
 import com.helpers.classrelationship.neo4j.persistor.calls.AbstractInMethodActionPersistor
 import org.neo4j.graphdb.RelationshipType
-import org.neo4j.helpers.collection.Iterables;
-import org.neo4j.unsafe.batchinsert.BatchInserter;
+import org.neo4j.helpers.collection.Iterables
+import org.neo4j.unsafe.batchinsert.BatchInserter
 
 class FieldsCallPersistor extends AbstractInMethodActionPersistor<FieldCallAnalyzer.FieldCallDto> {
 
