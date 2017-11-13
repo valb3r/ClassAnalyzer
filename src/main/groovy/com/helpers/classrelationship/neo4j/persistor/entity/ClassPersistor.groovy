@@ -6,6 +6,7 @@ import com.helpers.classrelationship.analysis.JarRegistry
 import com.helpers.classrelationship.analysis.MethodRegistry
 import com.helpers.classrelationship.neo4j.CodeLabels
 import com.helpers.classrelationship.neo4j.CodeRelationships
+import com.helpers.classrelationship.neo4j.persistor.Constants
 import org.apache.bcel.generic.ObjectType
 import org.apache.bcel.generic.Type
 import org.neo4j.unsafe.batchinsert.BatchInserter
@@ -44,8 +45,8 @@ class ClassPersistor {
 
             def id = inserter.createNode([
                     (Constants.Class.SIMPLE_NAME): simpleName,
-                    (Constants.Class.NAME): classDesc.assignedClass.className,
-                    (Constants.Class.PACKAGE): classDesc.assignedClass.packageName
+                    (Constants.Class.NAME)       : classDesc.assignedClass.className,
+                    (Constants.Class.PACKAGE)    : classDesc.assignedClass.packageName
             ], classDesc.assignedClass.interface ? CodeLabels.Labels.Interface : CodeLabels.Labels.Class)
             classDesc.entityId = id
         }

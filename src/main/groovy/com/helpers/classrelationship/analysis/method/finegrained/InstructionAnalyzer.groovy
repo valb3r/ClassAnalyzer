@@ -2,7 +2,7 @@ package com.helpers.classrelationship.analysis.method.finegrained
 
 import org.apache.bcel.generic.Instruction
 
-interface InstructionAnalyzer {
+interface InstructionAnalyzer<A extends InMethodBodyAction, I extends Instruction> {
 
-    BodyAction analyze(Instruction instruction)
+    A analyze(I instruction)
 }

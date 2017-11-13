@@ -4,6 +4,7 @@ import com.helpers.classrelationship.analysis.AppRegistry
 import com.helpers.classrelationship.analysis.JarRegistry
 import com.helpers.classrelationship.neo4j.CodeLabels
 import com.helpers.classrelationship.neo4j.CodeRelationships
+import com.helpers.classrelationship.neo4j.persistor.Constants
 import org.neo4j.unsafe.batchinsert.BatchInserter
 
 class JarPersistor {
@@ -21,7 +22,7 @@ class JarPersistor {
     void persist() {
         jarRegistry.getRegistry().forEach { jarName, jarDesc ->
             def id = inserter.createNode([
-                    (Constants.Jar.NAME): jarDesc.name,
+                    (Constants.Jar.NAME) : jarDesc.name,
                     (Constants.Jar.PATHS): jarDesc.paths.toString()
             ], CodeLabels.Labels.Jar)
             jarDesc.entityId = id

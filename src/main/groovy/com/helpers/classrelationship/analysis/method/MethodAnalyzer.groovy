@@ -3,7 +3,7 @@ package com.helpers.classrelationship.analysis.method
 import com.google.common.collect.ImmutableMap
 import com.helpers.classrelationship.analysis.ClassFileAnalyzer
 import com.helpers.classrelationship.analysis.MethodRegistry
-import com.helpers.classrelationship.analysis.method.finegrained.BodyAction
+import com.helpers.classrelationship.analysis.method.finegrained.InMethodBodyAction
 import com.helpers.classrelationship.analysis.method.finegrained.ExternalCallAnalyzer
 import com.helpers.classrelationship.analysis.method.finegrained.FieldCallAnalyzer
 import com.helpers.classrelationship.analysis.method.finegrained.InstructionAnalyzer
@@ -31,7 +31,7 @@ class MethodAnalyzer {
         this.method = method
     }
 
-    List<BodyAction> analyze() {
+    List<InMethodBodyAction> analyze() {
         String fullClassName = classAnalyzer.get().getClassName()
         MethodGen mg = new MethodGen(method, fullClassName, classAnalyzer.internals().constPoolGen)
         InstructionList il = mg.getInstructionList()
@@ -42,14 +42,14 @@ class MethodAnalyzer {
         // limit to external class calls
         return il.getInstructionHandles().toList().stream()
                 .map {it.getInstruction()}
-                .map {getDispatcher(it)}
+                .map {getDispatcher(it).analyze(it)}
                 .filter {null != it}
                 .map {it.(it)}
                 .filter {null != it}
                 .collect {it}
     }
 
-    private Closure getDispatcher(Instruction instruction) {
+    private InstructionAnalyzer getDispatcher(Instruction instruction) {
         dispatchers.get(
                 dispatchers.keySet().find {kind -> instruction?.getClass()?.isInstance(kind)}
         )

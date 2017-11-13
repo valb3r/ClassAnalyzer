@@ -1,4 +1,4 @@
-package com.helpers.classrelationship.neo4j.persistor.entity
+package com.helpers.classrelationship.neo4j.persistor
 
 class Constants {
 

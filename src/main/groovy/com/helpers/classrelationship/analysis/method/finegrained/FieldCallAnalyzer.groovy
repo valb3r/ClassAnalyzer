@@ -1,44 +1,31 @@
 package com.helpers.classrelationship.analysis.method.finegrained
 
 import com.helpers.classrelationship.analysis.ClassFileAnalyzer
-import org.apache.bcel.generic.ConstantPoolGen
 import org.apache.bcel.generic.FieldInstruction
-import org.apache.bcel.generic.ObjectType
 import org.apache.bcel.generic.ReferenceType;
 import org.apache.bcel.generic.Type;
 
-class FieldCallAnalyzer implements InstructionAnalyzer {
-
-    private final ClassFileAnalyzer classAnalyzer
+class FieldCallAnalyzer extends FieldOrMethodAnalyzer<FieldChangeDto, FieldInstruction> {
 
     FieldCallAnalyzer(ClassFileAnalyzer classAnalyzer) {
-        this.classAnalyzer = classAnalyzer
+        super(classAnalyzer)
     }
 
-    FieldChangeDto buildFromInstruction(FieldInstruction invoke) {
-        ConstantPoolGen constantPoolGen = classAnalyzer.internals().constPoolGen
-        ReferenceType referenceType = invoke.getReferenceType(constantPoolGen)
-        if (!(referenceType instanceof ObjectType)) {
-            return null
-        }
+    @Override
+    FieldChangeDto doAnalyze(FieldInstruction invoke, ReferenceType referenceType) {
 
-        ObjectType objectType = (ObjectType) referenceType
-        String referencedClassName = objectType.getClassName()
+        String fieldName = invoke.getFieldName(constantPoolGen)
+        Type fieldType = invoke.getFieldType(constantPoolGen)
 
-        String methodName = invoke.getMethodName(constantPoolGen)
-        Type[] argumentTypes = invoke.getArgumentTypes(constantPoolGen)
-
-        return new ExternalMethodCallDto([
-                referencedClassName: referencedClassName,
-                methodName: methodName,
-                argumentTypes: argumentTypes
+        return new FieldChangeDto([
+                fieldName: fieldName,
+                fieldType: fieldType
         ])
     }
 
-    static class FieldChangeDto implements BodyAction {
+    static class FieldChangeDto implements InMethodBodyAction {
 
-        String referencedClassName
-        String methodName
-        Type[] argumentTypes
+        String fieldName
+        Type fieldType
     }
 }

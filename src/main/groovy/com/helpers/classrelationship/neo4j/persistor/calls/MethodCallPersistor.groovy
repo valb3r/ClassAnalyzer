@@ -4,8 +4,10 @@ import com.helpers.classrelationship.analysis.ClassFileAnalyzer
 import com.helpers.classrelationship.analysis.ClassRegistry
 import com.helpers.classrelationship.analysis.method.MethodAnalyzer
 import com.helpers.classrelationship.analysis.MethodRegistry
+import com.helpers.classrelationship.analysis.method.finegrained.ExternalCallAnalyzer
+import com.helpers.classrelationship.analysis.method.finegrained.InMethodBodyAction
 import com.helpers.classrelationship.neo4j.CodeRelationships
-import com.helpers.classrelationship.neo4j.persistor.entity.Constants
+import com.helpers.classrelationship.neo4j.persistor.Constants
 import org.neo4j.helpers.collection.Iterables
 import org.neo4j.unsafe.batchinsert.BatchInserter
 
@@ -61,12 +63,12 @@ class MethodCallPersistor {
         }
     }
 
-    private void persistMethodCalls(MethodRegistry.MethodDto method, List<MethodAnalyzer.MethodDto> methodCalls) {
+    private void persistMethodCalls(MethodRegistry.MethodDto method, List<InMethodBodyAction> methodCalls) {
         if (null == method || methodCalls.isEmpty()) {
             return
         }
 
-        def resolvedCalls = methodCalls.stream().map {
+        def resolvedCalls = methodCalls.stream().map {(ExternalCallAnalyzer.ExternalMethodCallDto) it}.map {
             def refClass = classRegistry.get(it.referencedClassName)
             def refMethod = methodRegistry.get(it.referencedClassName, it.methodName, it.argumentTypes)
             refClass && refMethod ? refMethod : null

@@ -7,20 +7,15 @@ import org.apache.bcel.generic.ObjectType
 import org.apache.bcel.generic.ReferenceType
 import org.apache.bcel.generic.Type
 
-class ExternalCallAnalyzer {
-
-    private final ClassFileAnalyzer classAnalyzer
+class ExternalCallAnalyzer extends FieldOrMethodAnalyzer<ExternalMethodCallDto, InvokeInstruction> {
 
     ExternalCallAnalyzer(ClassFileAnalyzer classAnalyzer) {
-        this.classAnalyzer = classAnalyzer
+        super(classAnalyzer)
     }
 
-    ExternalMethodCallDto buildFromInstruction(InvokeInstruction invoke) {
+    @Override
+    ExternalMethodCallDto doAnalyze(InvokeInstruction invoke, ReferenceType referenceType) {
         ConstantPoolGen constantPoolGen = classAnalyzer.internals().constPoolGen
-        ReferenceType referenceType = invoke.getReferenceType(constantPoolGen)
-        if (!(referenceType instanceof ObjectType)) {
-            return null
-        }
 
         ObjectType objectType = (ObjectType) referenceType
         String referencedClassName = objectType.getClassName()
@@ -35,7 +30,7 @@ class ExternalCallAnalyzer {
         ])
     }
 
-    static class ExternalMethodCallDto implements BodyAction {
+    static class ExternalMethodCallDto implements InMethodBodyAction {
 
         String referencedClassName
         String methodName

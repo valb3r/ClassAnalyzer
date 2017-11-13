@@ -2,6 +2,7 @@ package com.helpers.classrelationship.neo4j.persistor.entity
 
 import com.helpers.classrelationship.analysis.AppRegistry
 import com.helpers.classrelationship.neo4j.CodeLabels
+import com.helpers.classrelationship.neo4j.persistor.Constants
 import org.neo4j.unsafe.batchinsert.BatchInserter
 
 class AppPersistor {
