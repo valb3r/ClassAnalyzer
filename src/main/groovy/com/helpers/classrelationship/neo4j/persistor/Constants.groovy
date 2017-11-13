@@ -1,4 +1,4 @@
-package com.helpers.classrelationship.neo4j.persistor.entity
+package com.helpers.classrelationship.neo4j.persistor
 
 class Constants {
 
@@ -30,6 +30,7 @@ class Constants {
 
         static final String NAME = "name"
         static final String TYPE = "type"
+        static final String CALL_COUNT = "count"
     }
 
     class Method {

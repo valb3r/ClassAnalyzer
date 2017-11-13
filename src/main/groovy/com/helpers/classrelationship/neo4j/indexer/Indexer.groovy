@@ -1,12 +1,12 @@
 package com.helpers.classrelationship.neo4j.indexer
 
 import com.helpers.classrelationship.neo4j.CodeLabels
-import com.helpers.classrelationship.neo4j.persistor.entity.Constants
+import com.helpers.classrelationship.neo4j.persistor.Constants
 import org.neo4j.unsafe.batchinsert.BatchInserter
 
 class Indexer {
 
-    private final BatchInserter batchInserter;
+    private final BatchInserter batchInserter
 
     Indexer(BatchInserter batchInserter) {
         this.batchInserter = batchInserter
