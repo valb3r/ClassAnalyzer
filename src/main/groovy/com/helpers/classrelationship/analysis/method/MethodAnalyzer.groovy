@@ -42,16 +42,14 @@ class MethodAnalyzer {
         // limit to external class calls
         return il.getInstructionHandles().toList().stream()
                 .map {it.getInstruction()}
-                .map {getDispatcher(it).analyze(it)}
-                .filter {null != it}
-                .map {it.(it)}
+                .map {getDispatcher(it)?.analyze(it)}
                 .filter {null != it}
                 .collect {it}
     }
 
     private InstructionAnalyzer getDispatcher(Instruction instruction) {
         dispatchers.get(
-                dispatchers.keySet().find {kind -> instruction?.getClass()?.isInstance(kind)}
+                dispatchers.keySet().find {kind -> kind.isInstance(instruction)}
         )
     }
 }

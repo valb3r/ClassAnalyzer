@@ -6,7 +6,7 @@ import org.neo4j.unsafe.batchinsert.BatchInserter
 
 class Indexer {
 
-    private final BatchInserter batchInserter;
+    private final BatchInserter batchInserter
 
     Indexer(BatchInserter batchInserter) {
         this.batchInserter = batchInserter

@@ -5,25 +5,25 @@ import org.apache.bcel.generic.FieldInstruction
 import org.apache.bcel.generic.ReferenceType;
 import org.apache.bcel.generic.Type;
 
-class FieldCallAnalyzer extends FieldOrMethodAnalyzer<FieldChangeDto, FieldInstruction> {
+class FieldCallAnalyzer extends FieldOrMethodAnalyzer<FieldCallDto, FieldInstruction> {
 
     FieldCallAnalyzer(ClassFileAnalyzer classAnalyzer) {
         super(classAnalyzer)
     }
 
     @Override
-    FieldChangeDto doAnalyze(FieldInstruction invoke, ReferenceType referenceType) {
+    FieldCallDto doAnalyze(FieldInstruction invoke, ReferenceType referenceType) {
 
         String fieldName = invoke.getFieldName(constantPoolGen)
         Type fieldType = invoke.getFieldType(constantPoolGen)
 
-        return new FieldChangeDto([
+        return new FieldCallDto([
                 fieldName: fieldName,
                 fieldType: fieldType
         ])
     }
 
-    static class FieldChangeDto implements InMethodBodyAction {
+    static class FieldCallDto implements InMethodBodyAction {
 
         String fieldName
         Type fieldType

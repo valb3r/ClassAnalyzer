@@ -8,7 +8,7 @@ import com.helpers.classrelationship.analysis.ClassRegistry
 import com.helpers.classrelationship.analysis.MethodRegistry
 import com.helpers.classrelationship.neo4j.Neo4j
 import com.helpers.classrelationship.neo4j.indexer.Indexer
-import com.helpers.classrelationship.neo4j.persistor.calls.MethodCallPersistor
+import com.helpers.classrelationship.neo4j.persistor.calls.MethodBodyActionsPersistor
 import com.helpers.classrelationship.neo4j.persistor.entity.AppPersistor
 import com.helpers.classrelationship.neo4j.persistor.entity.ClassPersistor
 import com.helpers.classrelationship.neo4j.persistor.entity.JarPersistor
@@ -27,7 +27,8 @@ import org.neo4j.unsafe.batchinsert.BatchInserter
  */
 
 final def DIRECTORIES = (args[0].split(";")).toList()
-final def POOL_SIZE = 5
+final def SMALL_POOL_SIZE = 1
+final def POOL_SIZE = 1
 final String REGEX_CLASS_INCLUDE = args[1]
 final String REGEX_CLASS_EXCLUDE = args[2]
 final String REGEX_METHOD_BODY_INCLUDE = args[3]
@@ -75,24 +76,23 @@ try {
     }
 
     Benchmark.method("Persists applications", "${ APPS.registry.size() }") {
-        new AppPersistor(APPS, INSERTER).persist()
+        new AppPersistor(SMALL_POOL_SIZE, APPS, INSERTER).persist({true})
 
     }
 
     Benchmark.method("Persists jars", "${ JARS.registry.size() }") {
-        new JarPersistor(APPS, JARS, INSERTER).persist()
+        new JarPersistor(SMALL_POOL_SIZE, APPS, JARS, INSERTER).persist({true})
     }
 
     Benchmark.method("Persists classes", "${ CLASSES.registry.size() }") {
-        new ClassPersistor(APPS, JARS, CLASSES, METHODS, INSERTER).persist()
+        new ClassPersistor(POOL_SIZE, JARS, CLASSES, METHODS, INSERTER).persist({true})
     }
 
-    Set<String> classesForMethodCallAnalysis = CLASSES.registry.entrySet().stream()
-            .map {it.value.assignedClass.className}
-            .filter { it.matches(REGEX_METHOD_BODY_INCLUDE) && !it.matches(REGEX_METHOD_BODY_EXCLUDE) }
-            .collect {it}
-    Benchmark.method("Persists method body calls", "${ classesForMethodCallAnalysis.size() }") {
-        new MethodCallPersistor(METHODS, CLASSES, INSERTER, POOL_SIZE).persist(classesForMethodCallAnalysis)
+    Benchmark.method("Persists method body calls", "Before filter ${ CLASSES.registry.size() }") {
+        new MethodBodyActionsPersistor(POOL_SIZE, METHODS, CLASSES, INSERTER)
+                .persist({
+            it.className.matches(REGEX_METHOD_BODY_INCLUDE) && !it.className.matches(REGEX_METHOD_BODY_EXCLUDE)
+        })
     }
 
     Benchmark.method("Indexing data", "deferred") {
