@@ -6,7 +6,6 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Function
-import java.util.function.Predicate
 
 import static groovyx.gpars.GParsPool.withPool
 
@@ -83,7 +82,11 @@ abstract class AbstractPersistor<K, V> {
 
         protected A doAnalyze(K objectKey, V objectRef) {
             // override this if you want to do some time consuming call before persisting
-            return objectRef
+            if (V instanceof A) {
+                return (A) objectRef
+            }
+
+            return null
         }
 
         abstract protected void doPersist(K objectKey, V objectRef, A analyzedData)

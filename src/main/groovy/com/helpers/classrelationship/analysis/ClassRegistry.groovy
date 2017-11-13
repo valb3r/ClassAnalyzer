@@ -2,6 +2,7 @@ package com.helpers.classrelationship.analysis
 
 import org.apache.bcel.classfile.JavaClass
 import org.apache.bcel.generic.ClassGen
+import org.apache.bcel.generic.Type
 
 import java.util.concurrent.ConcurrentHashMap
 
@@ -43,7 +44,36 @@ class ClassRegistry implements RegistryInterface {
 
         Map<String, String> jarFilePathsAndHash = [:]
         Map<String, String> jarFilePathApp = [:]
+        Map<String, Long> fields = [:]
+        Map<MethodKey, Long> methods = [:]
         JavaClass assignedClass
         long entityId
+    }
+
+    static class MethodKey {
+
+        final String name
+        final Type[] args
+
+        MethodKey(String name, Type[] args) {
+            this.name = name
+            this.args = args
+        }
+
+        @Override
+        String toString() {
+            return name + Arrays.toString(args)
+        }
+
+        @Override
+        boolean equals(o) {
+            return Objects.equals(name, o.name) &&
+                    Objects.equals(Arrays.toString(args), Arrays.toString(o.args))
+        }
+
+        @Override
+        int hashCode() {
+            return Objects.hash(name, Arrays.toString(args))
+        }
     }
 }

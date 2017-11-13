@@ -2,7 +2,6 @@ package com.helpers.classrelationship.analysis.method
 
 import com.google.common.collect.ImmutableMap
 import com.helpers.classrelationship.analysis.ClassFileAnalyzer
-import com.helpers.classrelationship.analysis.MethodRegistry
 import com.helpers.classrelationship.analysis.method.finegrained.InMethodBodyAction
 import com.helpers.classrelationship.analysis.method.finegrained.ExternalCallAnalyzer
 import com.helpers.classrelationship.analysis.method.finegrained.FieldCallAnalyzer
@@ -16,7 +15,6 @@ import org.apache.bcel.generic.MethodGen
 
 class MethodAnalyzer {
 
-    private final MethodRegistry methodRegistry
     private final ClassFileAnalyzer classAnalyzer;
     private final Method method;
 
@@ -25,8 +23,7 @@ class MethodAnalyzer {
             .put(FieldInstruction.class, new FieldCallAnalyzer(classAnalyzer))
             .build()
 
-    MethodAnalyzer(MethodRegistry methodRegistry, ClassFileAnalyzer classAnalyzer, Method method) {
-        this.methodRegistry = methodRegistry
+    MethodAnalyzer(ClassFileAnalyzer classAnalyzer, Method method) {
         this.classAnalyzer = classAnalyzer
         this.method = method
     }

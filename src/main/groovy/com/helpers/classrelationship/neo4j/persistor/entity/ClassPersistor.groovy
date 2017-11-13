@@ -3,7 +3,6 @@ package com.helpers.classrelationship.neo4j.persistor.entity
 import com.google.common.collect.ImmutableList
 import com.helpers.classrelationship.analysis.ClassRegistry
 import com.helpers.classrelationship.analysis.JarRegistry
-import com.helpers.classrelationship.analysis.MethodRegistry
 import com.helpers.classrelationship.neo4j.CodeLabels
 import com.helpers.classrelationship.neo4j.CodeRelationships
 import com.helpers.classrelationship.neo4j.persistor.AbstractPersistor
@@ -17,13 +16,13 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
 
     private final ClassRegistry classRegistry
 
-    ClassPersistor(int poolSize, JarRegistry jarRegistry, ClassRegistry classRegistry, MethodRegistry methodRegistry,
+    ClassPersistor(int poolSize, JarRegistry jarRegistry, ClassRegistry classRegistry,
                    BatchInserter inserter) {
         super(poolSize, ImmutableList.of(
                 new EntityPersistor("Class entity", inserter),
                 new InterfaceSuperRelPersistor("Interfaces and extend", inserter, classRegistry),
                 new FieldsPersistor("Class fields", inserter, classRegistry),
-                new MethodPersistor("Class methods", inserter, classRegistry, methodRegistry),
+                new MethodPersistor("Class methods", inserter, classRegistry),
                 new JarRelPersistor("Class - JAR relationship", inserter, jarRegistry)
         ))
 
@@ -114,6 +113,8 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
                         (Constants.Field.TYPE): field.getType().toString()
                 ], CodeLabels.Labels.Field)
 
+                analyzed.fields[name] = id
+
                 // persist relations only for non-primitive fields
                 if (type instanceof ObjectType) {
                     def asObj = (ObjectType) type
@@ -129,12 +130,9 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
     private static class MethodPersistor extends PersistStage<String, ClassRegistry.ClassDto, ClassRegistry.ClassDto> {
 
         private final ClassRegistry classRegistry
-        private final MethodRegistry methodRegistry
 
-        MethodPersistor(String name, BatchInserter batchInserter, ClassRegistry classRegistry,
-                        MethodRegistry methodRegistry) {
+        MethodPersistor(String name, BatchInserter batchInserter, ClassRegistry classRegistry) {
             super(name, batchInserter)
-            this.methodRegistry = methodRegistry
             this.classRegistry = classRegistry
         }
 
@@ -152,7 +150,7 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
                         (Constants.Method.ARGS)             : args.toString()
                 ], CodeLabels.Labels.Method)
 
-                methodRegistry.add(analyzed.assignedClass.className, name, args, methodId)
+                analyzed.methods[new ClassRegistry.MethodKey(name, args)] = methodId
 
                 if (returns instanceof ObjectType) {
                     def asObj = (ObjectType) returns

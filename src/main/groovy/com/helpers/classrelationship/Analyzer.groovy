@@ -5,7 +5,6 @@ import com.helpers.classrelationship.analysis.JarAnalyzer
 import com.helpers.classrelationship.analysis.JarRegistry
 import com.helpers.classrelationship.analysis.JarRegistry.JarDto
 import com.helpers.classrelationship.analysis.ClassRegistry
-import com.helpers.classrelationship.analysis.MethodRegistry
 import com.helpers.classrelationship.neo4j.Neo4j
 import com.helpers.classrelationship.neo4j.indexer.Indexer
 import com.helpers.classrelationship.neo4j.persistor.calls.MethodBodyActionsPersistor
@@ -28,7 +27,7 @@ import org.neo4j.unsafe.batchinsert.BatchInserter
 
 final def DIRECTORIES = (args[0].split(";")).toList()
 final def SMALL_POOL_SIZE = 1
-final def POOL_SIZE = 1
+final def POOL_SIZE = 5
 final String REGEX_CLASS_INCLUDE = args[1]
 final String REGEX_CLASS_EXCLUDE = args[2]
 final String REGEX_METHOD_BODY_INCLUDE = args[3]
@@ -41,7 +40,6 @@ try {
     def APPS = new AppRegistry()
     def JARS = new JarRegistry()
     def CLASSES = new ClassRegistry()
-    def METHODS = new MethodRegistry()
 
     def processJarClasses = { String jarPath, Set<JavaClass> found, JarDto jar, String product ->
         found.stream()
@@ -85,13 +83,13 @@ try {
     }
 
     Benchmark.method("Persists classes", "${ CLASSES.registry.size() }") {
-        new ClassPersistor(POOL_SIZE, JARS, CLASSES, METHODS, INSERTER).persist({true})
+        new ClassPersistor(POOL_SIZE, JARS, CLASSES, INSERTER).persist({true})
     }
 
     Benchmark.method("Persists method body calls", "Before filter ${ CLASSES.registry.size() }") {
-        new MethodBodyActionsPersistor(POOL_SIZE, METHODS, CLASSES, INSERTER)
+        new MethodBodyActionsPersistor(POOL_SIZE, CLASSES, INSERTER)
                 .persist({
-            it.className.matches(REGEX_METHOD_BODY_INCLUDE) && !it.className.matches(REGEX_METHOD_BODY_EXCLUDE)
+            it.matches(REGEX_METHOD_BODY_INCLUDE) && !it.matches(REGEX_METHOD_BODY_EXCLUDE)
         })
     }
 

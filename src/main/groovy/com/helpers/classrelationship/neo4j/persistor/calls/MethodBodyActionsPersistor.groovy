@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import com.helpers.classrelationship.analysis.ClassFileAnalyzer
 import com.helpers.classrelationship.analysis.ClassRegistry
+import com.helpers.classrelationship.analysis.ClassRegistry.MethodKey
 import com.helpers.classrelationship.analysis.method.MethodAnalyzer
-import com.helpers.classrelationship.analysis.MethodRegistry
 import com.helpers.classrelationship.analysis.method.finegrained.ExternalCallAnalyzer
 import com.helpers.classrelationship.analysis.method.finegrained.FieldCallAnalyzer
 import com.helpers.classrelationship.analysis.method.finegrained.InMethodBodyAction
@@ -15,63 +15,60 @@ import com.helpers.classrelationship.neo4j.persistor.calls.external.ExternalCall
 import com.helpers.classrelationship.neo4j.persistor.calls.fields.FieldsCallPersistor
 import org.neo4j.unsafe.batchinsert.BatchInserter
 
-class MethodBodyActionsPersistor extends AbstractPersistor<MethodRegistry.Key, MethodRegistry.MethodDto> {
+class MethodBodyActionsPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
 
-    private final MethodRegistry methods
+    private final ClassRegistry classRegistry
 
-    MethodBodyActionsPersistor(int poolSize, MethodRegistry methods, ClassRegistry classRegistry,
+    MethodBodyActionsPersistor(int poolSize, ClassRegistry classRegistry,
                                BatchInserter inserter) {
         super(poolSize, ImmutableList.of(
-                new Persistor("Method body actions", inserter, classRegistry, methods)
+                new Persistor("Method body actions", inserter, classRegistry)
         ))
 
-        this.methods = methods
+        this.classRegistry = classRegistry
     }
 
     @Override
-    Map<MethodRegistry.Key, MethodRegistry.MethodDto> getObjectsByKey() {
-        return methods.getRegistry()
+    Map<String, ClassRegistry.ClassDto> getObjectsByKey() {
+        return classRegistry.getRegistry()
     }
 
-    private static class Persistor extends PersistStage<MethodRegistry.Key, MethodRegistry.MethodDto,
-            List<InMethodBodyAction>> {
+    private static class Persistor extends PersistStage<String, ClassRegistry.ClassDto,
+            Map<MethodKey, List<InMethodBodyAction>>> {
 
         private final ClassRegistry classes
-        private final MethodRegistry methods
 
         private final Map<Class, AbstractInMethodActionPersistor> dispatchers = ImmutableMap.builder()
-                .put(ExternalCallAnalyzer.ExternalMethodCallDto, new ExternalCallPersistor(inserter, classes, methods))
-                .put(FieldCallAnalyzer.FieldCallDto.class, new FieldsCallPersistor(inserter))
+                .put(ExternalCallAnalyzer.ExternalMethodCallDto.class, new ExternalCallPersistor(inserter, classes))
+                .put(FieldCallAnalyzer.FieldCallDto.class, new FieldsCallPersistor(inserter, classes))
                 .build()
 
-        Persistor(String name, BatchInserter batchInserter, ClassRegistry classes, MethodRegistry methods) {
+        Persistor(String name, BatchInserter batchInserter, ClassRegistry classes) {
             super(name, batchInserter)
             this.classes = classes
-            this.methods = methods
         }
 
         @Override
-        protected List<InMethodBodyAction> doAnalyze(MethodRegistry.Key key, MethodRegistry.MethodDto methodDto) {
-            def analyzer = new ClassFileAnalyzer(classes.get(key.className).assignedClass)
+        protected Map<MethodKey, List<InMethodBodyAction>> doAnalyze(String className, ClassRegistry.ClassDto clazz) {
+            def analyzer = new ClassFileAnalyzer(clazz.assignedClass)
 
-            return analyzer.findMethod(key.methodName, key.args)
-                    .map {new MethodAnalyzer(methods, analyzer, it).analyze()}
-                    .orElse([])
-        }
-
-        @Override
-        protected void doPersist(MethodRegistry.Key key, MethodRegistry.MethodDto methodDto,
-                                 List<InMethodBodyAction> actions) {
-            def actionsByDispatcher = actions.groupBy {findDispatcher(it)}
-
-            actionsByDispatcher.forEach {dispatcher, calls ->
-                dispatcher?.persist(methodDto, calls)
+            return clazz.assignedClass.methods.toList().collectEntries { method ->
+                [(new MethodKey(method.getName(), method.getArgumentTypes())):
+                         new MethodAnalyzer(analyzer, method).analyze()]
             }
         }
 
-        private AbstractInMethodActionPersistor findDispatcher(InMethodBodyAction instruction) {
-            Class actionKind = dispatchers.keySet().find { it.isInstance(instruction) }
-            return dispatchers.get(actionKind)
+        @Override
+        protected void doPersist(String keyName, ClassRegistry.ClassDto clazz,
+                                 Map<MethodKey, List<InMethodBodyAction>> instructionsByMethod) {
+
+            instructionsByMethod.forEach { method, instructions ->
+                def actionsByDispatcher = instructions.groupBy {dispatchers.get(it.getClass())}
+
+                actionsByDispatcher.forEach {dispatcher, calls ->
+                    dispatcher?.persist(clazz.methods[method], classes, calls)
+                }
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.helpers.classrelationship.neo4j.persistor.calls
 
-import com.helpers.classrelationship.analysis.MethodRegistry
+import com.helpers.classrelationship.analysis.ClassRegistry
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 
 abstract class AbstractInMethodActionPersistor<T> {
@@ -11,5 +11,5 @@ abstract class AbstractInMethodActionPersistor<T> {
         this.inserter = inserter
     }
 
-    abstract void persist(MethodRegistry.MethodDto method, List<T> calls)
+    abstract void persist(long originEntityId, ClassRegistry registry, List<T> calls)
 }
