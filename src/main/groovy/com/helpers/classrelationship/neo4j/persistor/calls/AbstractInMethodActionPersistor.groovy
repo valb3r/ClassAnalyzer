@@ -1,7 +1,7 @@
 package com.helpers.classrelationship.neo4j.persistor.calls
 
 import com.helpers.classrelationship.analysis.ClassRegistry
-import org.neo4j.unsafe.batchinsert.BatchInserter;
+import org.neo4j.unsafe.batchinsert.BatchInserter
 
 abstract class AbstractInMethodActionPersistor<T> {
 

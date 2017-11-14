@@ -18,17 +18,19 @@ class ClassNameReferenceAnalyzer implements InstructionAnalyzer<ClassNameReferen
     ClassNameReferenceDto analyze(LDC instruction) {
         ConstantPoolGen constantPoolGen = classAnalyzer.internals().constPoolGen
 
-        Type objectType = instruction.getType(constantPoolGen)
-        Object baseValue = instruction.getValue(constantPoolGen)
+        if (Type.CLASS != instruction.getType(constantPoolGen)) {
+            return null
+        }
 
-        if (Type.CLASS != objectType || !(baseValue instanceof ObjectType)) {
+        Object baseValue = instruction.getValue(constantPoolGen)
+        if (!(baseValue instanceof ObjectType)) {
             return null
         }
 
         ObjectType type = (ObjectType) baseValue
 
         return new ClassNameReferenceDto([
-                referencedClassName: type.getClassName(),
+                referencedClassName: type.getClassName()
         ])
     }
 

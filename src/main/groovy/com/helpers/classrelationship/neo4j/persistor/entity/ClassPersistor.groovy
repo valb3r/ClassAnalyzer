@@ -110,7 +110,8 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
                 def name = field.getName()
                 def id = inserter.createNode([
                         (Constants.Field.NAME): name,
-                        (Constants.Field.TYPE): field.getType().toString()
+                        (Constants.Field.TYPE): field.getType().toString(),
+                        (Constants.Field.OWNER_SIMPLE_NAME): extractSimpleName(className)
                 ], CodeLabels.Labels.Field)
 
                 analyzed.fields[name] = id

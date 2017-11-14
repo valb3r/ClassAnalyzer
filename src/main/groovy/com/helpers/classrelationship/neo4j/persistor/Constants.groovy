@@ -30,6 +30,7 @@ class Constants {
 
         static final String NAME = "name"
         static final String TYPE = "type"
+        static final String OWNER_SIMPLE_NAME = "ownerSimpleName"
         static final String CALL_COUNT = "count"
     }
 

@@ -44,7 +44,7 @@ class ClassFileAnalyzer {
                 .findFirst()
     }
 
-    boolean isSameMethod(Method method, String methodName, Type[] argumentTypes) {
+    static boolean isSameMethod(Method method, String methodName, Type[] argumentTypes) {
         return method.getName() == methodName && Arrays.equals(argumentTypes, method.getArgumentTypes())
     }
 

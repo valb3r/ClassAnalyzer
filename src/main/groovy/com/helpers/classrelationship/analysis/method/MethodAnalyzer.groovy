@@ -17,8 +17,8 @@ import org.apache.bcel.generic.MethodGen
 
 class MethodAnalyzer {
 
-    private final ClassFileAnalyzer classAnalyzer;
-    private final Method method;
+    private final ClassFileAnalyzer classAnalyzer
+    private final Method method
 
     private final Map<Class, InstructionAnalyzer> dispatchers = ImmutableMap.builder()
             .put(InvokeInstruction.class, new ExternalCallAnalyzer(classAnalyzer))
