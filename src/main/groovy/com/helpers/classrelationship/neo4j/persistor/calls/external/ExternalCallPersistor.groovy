@@ -5,7 +5,6 @@ import com.helpers.classrelationship.analysis.method.finegrained.ExternalCallAna
 import com.helpers.classrelationship.neo4j.CodeRelationships
 import com.helpers.classrelationship.neo4j.persistor.Constants
 import com.helpers.classrelationship.neo4j.persistor.calls.AbstractInMethodActionPersistor
-import org.neo4j.helpers.collection.Iterables
 import org.neo4j.unsafe.batchinsert.BatchInserter
 
 class ExternalCallPersistor extends AbstractInMethodActionPersistor<ExternalCallAnalyzer.ExternalMethodCallDto> {
@@ -20,28 +19,32 @@ class ExternalCallPersistor extends AbstractInMethodActionPersistor<ExternalCall
     @Override
     void persist(long originEntityId, ClassRegistry registry, List<ExternalCallAnalyzer.ExternalMethodCallDto> calls) {
 
-        def resolvedCalls = calls.stream().map {
+        def pos = -1
+        Map<Long, List<Integer>> posByCall = new LinkedHashMap<>()
+
+        for (def it : calls) {
+            pos++
             def refClass = classRegistry.get(it.referencedClassName)
             if (!refClass) {
-                return null
+                continue
             }
 
             def refKey = new ClassRegistry.MethodKey(it.methodName, it.argumentTypes)
             def refMethod = refClass?.methods?.get(refKey)
-
-            if (refClass && refMethod) {
-                return refMethod
+            refMethod = refMethod ? refMethod : findFromParentClass(refClass, refKey)
+            if (!refMethod) {
+                continue
             }
 
-            return findFromParentClass(refClass, refKey)
-        }.filter {null != it}
-                .collect {it}
+            posByCall.computeIfAbsent(refMethod, {[]}).add(pos)
+        }
 
-        def callsWithCount = resolvedCalls.groupBy {it}
-
-        callsWithCount.forEach {id, mtdCalls ->
-            inserter.createRelationship(originEntityId, Iterables.first(mtdCalls),
-                    CodeRelationships.Relationships.Calls, [(Constants.Method.CALL_COUNT): mtdCalls.size()])
+        posByCall.forEach {id, positions ->
+            inserter.createRelationship(originEntityId, id,
+                    CodeRelationships.Relationships.Calls, [
+                    (Constants.Method.CALL_COUNT): positions.size(),
+                    (Constants.Method.POSITION): positions.toString().replaceAll(" ", "")
+            ])
         }
     }
 
