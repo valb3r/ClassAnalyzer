@@ -209,12 +209,15 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
                     .forEach { method -> persistOverridesIfNeeded(method, analyzed) }
         }
 
+        // Will persist indirect overrides too, i.e. empty interface that extends some other interface
         private void persistOverridesIfNeeded(Method method, ClassRegistry.ClassDto analyzed) {
             def key = new ClassRegistry.MethodKey(method.name, method.argumentTypes)
             def methodId = analyzed.methods[key]
-            createOverridesRelIfNeeded(methodId, key, analyzed.assignedClass.getSuperclassName())
-            analyzed.assignedClass.getInterfaceNames().toList()
-                    .forEach {it -> createOverridesRelIfNeeded(methodId, key, it)}
+
+            classRegistry.expandAllSuperclasses(analyzed).forEach {it -> createOverridesRelIfNeeded(methodId, key, it) }
+
+            // persist indirect overrides too
+            classRegistry.expandAllInterfaces(analyzed).forEach {it -> createOverridesRelIfNeeded(methodId, key, it)}
         }
 
         private void createOverridesRelIfNeeded(long methodId, ClassRegistry.MethodKey forMethod, String parentName) {
@@ -229,6 +232,8 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
             inserter.createRelationship(methodId, parentMethodId, CodeRelationships.Relationships.Overrides, [:])
             inserter.createRelationship(parentMethodId, methodId, CodeRelationships.Relationships.OverriddenBy, [:])
         }
+
+
     }
 
     private static class JarRelPersistor extends PersistStage<String, ClassRegistry.ClassDto, ClassRegistry.ClassDto> {

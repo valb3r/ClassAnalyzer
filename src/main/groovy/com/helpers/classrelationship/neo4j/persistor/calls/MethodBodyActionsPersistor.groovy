@@ -64,7 +64,6 @@ class MethodBodyActionsPersistor extends AbstractPersistor<String, ClassRegistry
         @Override
         protected void doPersist(String keyName, ClassRegistry.ClassDto clazz,
                                  Map<MethodKey, List<InMethodBodyAction>> instructionsByMethod) {
-
             instructionsByMethod.forEach { method, instructions ->
                 def actionsByDispatcher = instructions.groupBy {dispatchers.get(it.getClass())}
 

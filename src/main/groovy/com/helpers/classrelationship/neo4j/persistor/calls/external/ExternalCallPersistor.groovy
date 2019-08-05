@@ -22,9 +22,18 @@ class ExternalCallPersistor extends AbstractInMethodActionPersistor<ExternalCall
 
         def resolvedCalls = calls.stream().map {
             def refClass = classRegistry.get(it.referencedClassName)
-            def refMethod = refClass?.methods?.get(new ClassRegistry.MethodKey(it.methodName, it.argumentTypes))
+            if (!refClass) {
+                return null
+            }
 
-            refClass && refMethod ? refMethod : null
+            def refKey = new ClassRegistry.MethodKey(it.methodName, it.argumentTypes)
+            def refMethod = refClass?.methods?.get(refKey)
+
+            if (refClass && refMethod) {
+                return refMethod
+            }
+
+            return findFromParentClass(refClass, refKey)
         }.filter {null != it}
                 .collect {it}
 
@@ -34,5 +43,18 @@ class ExternalCallPersistor extends AbstractInMethodActionPersistor<ExternalCall
             inserter.createRelationship(originEntityId, Iterables.first(mtdCalls),
                     CodeRelationships.Relationships.Calls, [(Constants.Method.CALL_COUNT): mtdCalls.size()])
         }
+    }
+
+    private Long findFromParentClass(ClassRegistry.ClassDto classDto, ClassRegistry.MethodKey key) {
+        Set<String> superOwners = new LinkedHashSet<>(classRegistry.expandAllSuperclasses(classDto))
+        superOwners.addAll(classRegistry.expandAllInterfaces(classDto))
+
+        return superOwners.stream()
+                .map {classRegistry.get(it)}
+                .filter {null != it}
+                .map {it.methods.get(key)}
+                .filter {null != it}
+                .findFirst()
+                .orElse(null)
     }
 }
