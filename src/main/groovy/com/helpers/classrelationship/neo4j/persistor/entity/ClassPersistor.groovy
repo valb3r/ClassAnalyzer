@@ -8,6 +8,7 @@ import com.helpers.classrelationship.neo4j.CodeRelationships
 import com.helpers.classrelationship.neo4j.persistor.AbstractPersistor
 import com.helpers.classrelationship.neo4j.persistor.AbstractPersistor.PersistStage
 import com.helpers.classrelationship.neo4j.persistor.Constants
+import org.apache.bcel.classfile.Method
 import org.apache.bcel.generic.ObjectType
 import org.apache.bcel.generic.Type
 import org.neo4j.unsafe.batchinsert.BatchInserter
@@ -79,18 +80,25 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
         void doPersist(String className, ClassRegistry.ClassDto original, ClassRegistry.ClassDto analyzed) {
             // only directly visible interfaces and super classes
             def extend = analyzed.assignedClass.getSuperclassName()
+            createExtendsRel(analyzed, extend)
+
+            analyzed.assignedClass.getInterfaceNames().toList()
+                    .forEach { iface -> createExtendsRel(analyzed, iface) }
+        }
+
+        private void createExtendsRel(ClassRegistry.ClassDto analyzed, String extendsName) {
+            def extend = extendsName
             def clazz = classRegistry.get(extend) ?: classRegistry.getUnresolved()
+
             inserter.createRelationship(analyzed.entityId, clazz.entityId, CodeRelationships.Relationships.Extends, [
                     (Constants.Class.CLASS): extend,
                     (Constants.Class.SIMPLE_NAME): extractSimpleName(extend)
             ])
-            analyzed.assignedClass.getInterfaceNames().toList().forEach { iface ->
-                def ifaceClazz = classRegistry.get(iface) ?: classRegistry.getUnresolved()
-                inserter.createRelationship(analyzed.entityId, ifaceClazz.entityId, CodeRelationships.Relationships.Extends, [
-                        (Constants.Class.INTERFACE): iface,
-                        (Constants.Class.SIMPLE_NAME): extractSimpleName(iface)
-                ])
-            }
+
+            inserter.createRelationship(clazz.entityId, analyzed.entityId, CodeRelationships.Relationships.IsA, [
+                    (Constants.Class.CLASS): extend,
+                    (Constants.Class.SIMPLE_NAME): extractSimpleName(extend)
+            ])
         }
     }
 
@@ -160,8 +168,10 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
                 }
 
                 inserter.createRelationship(analyzed.entityId, methodId, CodeRelationships.Relationships.Has, [:])
+                inserter.createRelationship(methodId, analyzed.entityId, CodeRelationships.Relationships.IsIn, [:])
 
                 persistMethodArgs(args, methodId)
+                persistOverridesIfNeeded(method, analyzed)
             }
         }
 
@@ -181,6 +191,27 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
                     inserter.createRelationship(argId, clazz.entityId, CodeRelationships.Relationships.Is, [:])
                 }
             }
+        }
+
+        private void persistOverridesIfNeeded(Method method, ClassRegistry.ClassDto analyzed) {
+            def key = new ClassRegistry.MethodKey(method.name, method.argumentTypes)
+            def methodId = analyzed.methods[key]
+            createOverridesRelIfNeeded(methodId, key, analyzed.assignedClass.getSuperclassName())
+            analyzed.assignedClass.getInterfaceNames().toList()
+                    .forEach {it -> createOverridesRelIfNeeded(methodId, key, it)}
+        }
+
+        private void createOverridesRelIfNeeded(long methodId, ClassRegistry.MethodKey forMethod, String parentName) {
+            def clazz = classRegistry.get(parentName) ?: classRegistry.getUnresolved()
+
+            if (!clazz.methods.containsKey(forMethod)) {
+                return
+            }
+
+            long parentMethodId = clazz.methods[forMethod]
+
+            inserter.createRelationship(methodId, parentMethodId, CodeRelationships.Relationships.Overrides, [:])
+            inserter.createRelationship(parentMethodId, methodId, CodeRelationships.Relationships.OverriddenBy, [:])
         }
     }
 
