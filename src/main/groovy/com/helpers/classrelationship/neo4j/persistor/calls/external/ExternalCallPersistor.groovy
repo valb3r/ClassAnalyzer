@@ -7,8 +7,6 @@ import com.helpers.classrelationship.neo4j.persistor.Constants
 import com.helpers.classrelationship.neo4j.persistor.calls.AbstractInMethodActionPersistor
 import org.neo4j.unsafe.batchinsert.BatchInserter
 
-import java.util.stream.Collectors
-
 class ExternalCallPersistor extends AbstractInMethodActionPersistor<ExternalCallAnalyzer.ExternalMethodCallDto> {
 
     private final ClassRegistry classRegistry
@@ -46,7 +44,7 @@ class ExternalCallPersistor extends AbstractInMethodActionPersistor<ExternalCall
                     CodeRelationships.Relationships.Calls, [
                     (Constants.Method.CALL_COUNT): positions.size(),
                     (Constants.Method.MIN_POSITION): Collections.min(positions),
-                    (Constants.Method.POSITION): positions.stream().collect { Collectors.joining(",")}
+                    (Constants.Method.POSITION): positions.join(",")
             ])
         }
     }
