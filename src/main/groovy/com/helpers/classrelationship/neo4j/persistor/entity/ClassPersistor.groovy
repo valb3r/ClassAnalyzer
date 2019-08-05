@@ -24,6 +24,7 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
                 new InterfaceSuperRelPersistor("Interfaces and extend", inserter, classRegistry),
                 new FieldsPersistor("Class fields", inserter, classRegistry),
                 new MethodPersistor("Class methods", inserter, classRegistry),
+                new OverridesRelPersistor("Method overrides relationship", inserter, classRegistry),
                 new JarRelPersistor("Class - JAR relationship", inserter, jarRegistry)
         ))
 
@@ -171,7 +172,6 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
                 inserter.createRelationship(methodId, analyzed.entityId, CodeRelationships.Relationships.IsIn, [:])
 
                 persistMethodArgs(args, methodId)
-                persistOverridesIfNeeded(method, analyzed)
             }
         }
 
@@ -191,6 +191,22 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
                     inserter.createRelationship(argId, clazz.entityId, CodeRelationships.Relationships.Is, [:])
                 }
             }
+        }
+    }
+
+    private static class OverridesRelPersistor extends PersistStage<String, ClassRegistry.ClassDto, ClassRegistry.ClassDto> {
+
+        private final ClassRegistry classRegistry
+
+        OverridesRelPersistor(String name, BatchInserter batchInserter, ClassRegistry classRegistry) {
+            super(name, batchInserter)
+            this.classRegistry = classRegistry
+        }
+
+        @Override
+        void doPersist(String className, ClassRegistry.ClassDto original, ClassRegistry.ClassDto analyzed) {
+            analyzed.assignedClass.methods.toList()
+                    .forEach { method -> persistOverridesIfNeeded(method, analyzed) }
         }
 
         private void persistOverridesIfNeeded(Method method, ClassRegistry.ClassDto analyzed) {
