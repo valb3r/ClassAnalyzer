@@ -19,8 +19,8 @@ dependencies {
     compile 'org.yaml:snakeyaml:1.18'
     compile 'org.codehaus.gpars:gpars:1.2.1'
     compile 'commons-io:commons-io:2.6'
-    compile 'org.apache.bcel:bcel:6.1'
-    compile 'org.neo4j:neo4j:3.3.0'
+    compile 'org.apache.bcel:bcel:6.3.1'
+    compile 'org.neo4j:neo4j:3.5.8'
 }
 
 task analyzeJars (dependsOn: 'classes', type: JavaExec) {
