@@ -43,6 +43,7 @@ class ExternalCallPersistor extends AbstractInMethodActionPersistor<ExternalCall
             inserter.createRelationship(originEntityId, id,
                     CodeRelationships.Relationships.Calls, [
                     (Constants.Method.CALL_COUNT): positions.size(),
+                    (Constants.Method.MIN_POSITION): Collections.min(positions),
                     (Constants.Method.POSITION): positions.toString().replaceAll(" ", "")
             ])
         }

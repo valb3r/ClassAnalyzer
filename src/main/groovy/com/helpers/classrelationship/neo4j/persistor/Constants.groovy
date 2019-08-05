@@ -41,6 +41,7 @@ class Constants {
         static final String ARGS = "args"
         static final String OWNER_SIMPLE_NAME = "ownerSimpleName"
         static final String CALL_COUNT = "count"
+        static final String MIN_POSITION = "minPos"
         static final String POSITION = "position"
 
         class Arg {
