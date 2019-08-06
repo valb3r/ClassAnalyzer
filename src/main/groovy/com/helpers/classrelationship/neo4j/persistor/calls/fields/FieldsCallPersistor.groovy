@@ -13,8 +13,8 @@ import org.neo4j.unsafe.batchinsert.BatchInserter
 class FieldsCallPersistor extends AbstractInMethodActionPersistor<FieldCallAnalyzer.FieldCallDto> {
 
     private final Map<FieldCallAnalyzer.FieldCallDto.Kind, RelationshipType> RELATIONSHIPS = ImmutableMap.of(
-            FieldCallAnalyzer.FieldCallDto.Kind.PUT, CodeRelationships.Relationships.Put,
-            FieldCallAnalyzer.FieldCallDto.Kind.GET, CodeRelationships.Relationships.Get
+            FieldCallAnalyzer.FieldCallDto.Kind.PUT, CodeRelationships.Relationships.PUT,
+            FieldCallAnalyzer.FieldCallDto.Kind.GET, CodeRelationships.Relationships.GET
     )
 
     private final ClassRegistry classRegistry

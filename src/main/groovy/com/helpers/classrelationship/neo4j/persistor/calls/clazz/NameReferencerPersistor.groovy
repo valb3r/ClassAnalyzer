@@ -28,8 +28,12 @@ class NameReferencerPersistor extends AbstractInMethodActionPersistor<ClassNameR
         def callsWithCount = resolvedUses.groupBy {it}
 
         callsWithCount.forEach {id, clzCalls ->
-            inserter.createRelationship(originEntityId, Iterables.first(clzCalls),
-                    CodeRelationships.Relationships.UsesClassName, [(Constants.StaticReference.CALL_COUNT): clzCalls.size()])
+            inserter.createRelationship(
+                    originEntityId,
+                    Iterables.first(clzCalls),
+                    CodeRelationships.Relationships.USES_CLASS_NAME,
+                    [(Constants.StaticReference.CALL_COUNT): clzCalls.size()]
+            )
         }
     }
 }

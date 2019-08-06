@@ -43,7 +43,7 @@ class JarPersistor extends AbstractPersistor<String, JarRegistry.JarDto> {
 
             analyzed.appNames.forEach {app ->
                 def resovledApp = appRegistry.get(app) ?: appRegistry.getUnresolved()
-                inserter.createRelationship(resovledApp.entityId, id, CodeRelationships.Relationships.Composed, [:])
+                inserter.createRelationship(resovledApp.entityId, id, CodeRelationships.Relationships.COMPOSED, [:])
             }
         }
     }

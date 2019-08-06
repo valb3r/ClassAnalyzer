@@ -91,12 +91,12 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
             def extend = extendsName
             def clazz = classRegistry.get(extend) ?: classRegistry.getUnresolved()
 
-            inserter.createRelationship(analyzed.entityId, clazz.entityId, CodeRelationships.Relationships.Extends, [
+            inserter.createRelationship(analyzed.entityId, clazz.entityId, CodeRelationships.Relationships.EXTENDS, [
                     (Constants.Class.CLASS): extend,
                     (Constants.Class.SIMPLE_NAME): extractSimpleName(extend)
             ])
 
-            inserter.createRelationship(clazz.entityId, analyzed.entityId, CodeRelationships.Relationships.IsA, [
+            inserter.createRelationship(clazz.entityId, analyzed.entityId, CodeRelationships.Relationships.IS_A, [
                     (Constants.Class.CLASS): extend,
                     (Constants.Class.SIMPLE_NAME): extractSimpleName(extend)
             ])
@@ -130,8 +130,8 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
                     def asObj = (ObjectType) type
                     def clazz = classRegistry.get(asObj.className) ?: classRegistry.getUnresolved()
 
-                    inserter.createRelationship(analyzed.entityId, id, CodeRelationships.Relationships.Has, [:])
-                    inserter.createRelationship(id, clazz.entityId, CodeRelationships.Relationships.Is, [:])
+                    inserter.createRelationship(analyzed.entityId, id, CodeRelationships.Relationships.HAS, [:])
+                    inserter.createRelationship(id, clazz.entityId, CodeRelationships.Relationships.IS, [:])
                 }
             }
         }
@@ -165,11 +165,11 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
                 if (returns instanceof ObjectType) {
                     def asObj = (ObjectType) returns
                     def clazz = classRegistry.get(asObj.className) ?: classRegistry.getUnresolved()
-                    inserter.createRelationship(methodId, clazz.entityId, CodeRelationships.Relationships.Returns, [:])
+                    inserter.createRelationship(methodId, clazz.entityId, CodeRelationships.Relationships.RETURNS, [:])
                 }
 
-                inserter.createRelationship(analyzed.entityId, methodId, CodeRelationships.Relationships.Has, [:])
-                inserter.createRelationship(methodId, analyzed.entityId, CodeRelationships.Relationships.IsIn, [:])
+                inserter.createRelationship(analyzed.entityId, methodId, CodeRelationships.Relationships.HAS, [:])
+                inserter.createRelationship(methodId, analyzed.entityId, CodeRelationships.Relationships.IS_IN, [:])
 
                 persistMethodArgs(args, methodId)
             }
@@ -182,13 +182,13 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
                         (Constants.Method.Arg.TYPE): arg.toString()
                 ], CodeLabels.Labels.Argument)
 
-                inserter.createRelationship(methodId, argId, CodeRelationships.Relationships.Argument, [:])
+                inserter.createRelationship(methodId, argId, CodeRelationships.Relationships.ARGUMENT, [:])
 
                 // persist relations only for non-primitive fields
                 if (arg instanceof ObjectType) {
                     def asObj = (ObjectType) arg
                     def clazz = classRegistry.get(asObj.className) ?: classRegistry.getUnresolved()
-                    inserter.createRelationship(argId, clazz.entityId, CodeRelationships.Relationships.Is, [:])
+                    inserter.createRelationship(argId, clazz.entityId, CodeRelationships.Relationships.IS, [:])
                 }
             }
         }
@@ -229,8 +229,8 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
 
             long parentMethodId = clazz.methods[forMethod]
 
-            inserter.createRelationship(methodId, parentMethodId, CodeRelationships.Relationships.Overrides, [:])
-            inserter.createRelationship(parentMethodId, methodId, CodeRelationships.Relationships.OverriddenBy, [:])
+            inserter.createRelationship(methodId, parentMethodId, CodeRelationships.Relationships.OVERRIDES, [:])
+            inserter.createRelationship(parentMethodId, methodId, CodeRelationships.Relationships.OVERRIDDEN_BY, [:])
         }
 
 
@@ -250,7 +250,7 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
             analyzed.jarFilePathsAndHash.forEach {jar, hash ->
                 def jarDto = jarRegistry.getByPath(jar) ?: jarRegistry.getUnresolved()
                 def appName = analyzed.jarFilePathApp.get(jar)
-                inserter.createRelationship(jarDto.entityId, analyzed.entityId, CodeRelationships.Relationships.Packs, [
+                inserter.createRelationship(jarDto.entityId, analyzed.entityId, CodeRelationships.Relationships.PACKS, [
                         (Constants.Class.JAR): jar,
                         (Constants.Class.HASH): hash,
                         (Constants.Class.APP): appName
