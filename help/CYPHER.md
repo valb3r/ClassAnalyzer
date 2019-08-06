@@ -9,6 +9,23 @@
 
 # Dirty and quick call insights:
 
+**Random walk using neo4j graph algorithms library**
+```genericsql
+MATCH (m:Method {name: "readDocument", ownerSimpleName: "DocumentController"})
+CALL algo.randomWalk.stream(id(m), 90, 350, {
+  nodeQuery: "MATCH (p:Method) WHERE p.name <> '<init>' RETURN id(p) as id",
+  relationshipQuery: "MATCH (p1:Method)-[:Calls|:OverriddenBy]->(p2:Method) RETURN id(p1) as source, id(p2) as target",
+  mode: "node2vec",
+  inOut: 1.0,
+  return: 0.01,
+  graph: "cypher"
+})
+YIELD nodeIds, path
+UNWIND nodeIds AS nodeId
+RETURN algo.asNode(nodeId) AS page
+
+```
+
 **Class analyzed - RateRule**
 
 **A-C class level path. Class A can possibly modify state of class C by calling B (virtual class level relationship tree)**
