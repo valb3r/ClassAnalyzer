@@ -4,20 +4,20 @@ import org.neo4j.graphdb.RelationshipType
 
 class CodeRelationships {
     enum Relationships implements RelationshipType {
-        Composed,
-        Packs,
-        Has,
-        Argument,
-        Is,
-        IsIn,
-        Returns,
-        Calls,
-        Extends,
-        IsA,
-        Get,
-        Put,
-        UsesClassName,
-        Overrides,
-        OverriddenBy
+        COMPOSED,
+        PACKS,
+        HAS,
+        ARGUMENT,
+        IS,
+        IS_IN,
+        RETURNS,
+        CALLS,
+        EXTENDS,
+        IS_A,
+        GET,
+        PUT,
+        USES_CLASS_NAME,
+        OVERRIDES,
+        OVERRIDDEN_BY
     }
 }
