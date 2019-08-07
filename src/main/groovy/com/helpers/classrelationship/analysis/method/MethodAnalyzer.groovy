@@ -7,8 +7,10 @@ import com.helpers.classrelationship.analysis.method.finegrained.InMethodBodyAct
 import com.helpers.classrelationship.analysis.method.finegrained.ExternalCallAnalyzer
 import com.helpers.classrelationship.analysis.method.finegrained.FieldCallAnalyzer
 import com.helpers.classrelationship.analysis.method.finegrained.InstructionAnalyzer
+import com.helpers.classrelationship.analysis.method.finegrained.LambdaCallAnalyzer
 import org.apache.bcel.classfile.Method
 import org.apache.bcel.generic.FieldInstruction
+import org.apache.bcel.generic.INVOKEDYNAMIC
 import org.apache.bcel.generic.Instruction
 import org.apache.bcel.generic.InstructionList
 import org.apache.bcel.generic.InvokeInstruction
@@ -20,7 +22,8 @@ class MethodAnalyzer {
     private final ClassFileAnalyzer classAnalyzer
     private final Method method
 
-    private final Map<Class, InstructionAnalyzer> dispatchers = ImmutableMap.builder()
+    private final Map<Class, InstructionAnalyzer> dispatchers = ImmutableMap.<Class, InstructionAnalyzer>builder()
+            .put(INVOKEDYNAMIC.class, new LambdaCallAnalyzer(classAnalyzer))
             .put(InvokeInstruction.class, new ExternalCallAnalyzer(classAnalyzer))
             .put(FieldInstruction.class, new FieldCallAnalyzer(classAnalyzer))
             .put(LDC.class, new ClassNameReferenceAnalyzer(classAnalyzer))
@@ -33,6 +36,7 @@ class MethodAnalyzer {
 
     List<InMethodBodyAction> analyze() {
         String fullClassName = classAnalyzer.get().getClassName()
+
         MethodGen mg = new MethodGen(method, fullClassName, classAnalyzer.internals().constPoolGen)
         InstructionList il = mg.getInstructionList()
         if (il == null) {

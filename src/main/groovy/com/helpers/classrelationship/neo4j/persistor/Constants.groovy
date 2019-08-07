@@ -39,6 +39,7 @@ class Constants {
         static final String NAME = "name"
         static final String RETURN = "return"
         static final String ARGS = "args"
+        static final String IS_LAMBDA = "isLambda"
         static final String OWNER_SIMPLE_NAME = "ownerSimpleName"
         static final String CALL_COUNT = "count"
         static final String MIN_POSITION = "minPos"

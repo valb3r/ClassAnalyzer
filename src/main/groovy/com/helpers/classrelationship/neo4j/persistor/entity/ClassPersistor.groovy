@@ -157,7 +157,8 @@ class ClassPersistor extends AbstractPersistor<String, ClassRegistry.ClassDto> {
                         (Constants.Method.NAME)             : name,
                         (Constants.Method.OWNER_SIMPLE_NAME): extractSimpleName(analyzed.assignedClass.className),
                         (Constants.Method.RETURN)           : returns.toString(),
-                        (Constants.Method.ARGS)             : args.toString()
+                        (Constants.Method.ARGS)             : args.toString(),
+                        (Constants.Method.IS_LAMBDA)        : method.isSynthetic()
                 ], CodeLabels.Labels.Method)
 
                 analyzed.methods[new ClassRegistry.MethodKey(name, args)] = methodId

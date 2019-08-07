@@ -40,7 +40,7 @@ class MethodBodyActionsPersistor extends AbstractPersistor<String, ClassRegistry
 
         private final ClassRegistry classes
 
-        private final Map<Class, AbstractInMethodActionPersistor> dispatchers = ImmutableMap.builder()
+        private final Map<Class, AbstractInMethodActionPersistor> dispatchers = ImmutableMap.<Class, AbstractInMethodActionPersistor>builder()
                 .put(ExternalCallAnalyzer.ExternalMethodCallDto.class, new ExternalCallPersistor(inserter, classes))
                 .put(FieldCallAnalyzer.FieldCallDto.class, new FieldsCallPersistor(inserter, classes))
                 .put(ClassNameReferenceAnalyzer.ClassNameReferenceDto.class, new NameReferencerPersistor(inserter, classes))

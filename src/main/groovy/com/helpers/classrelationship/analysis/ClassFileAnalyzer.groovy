@@ -12,6 +12,7 @@ class ClassFileAnalyzer {
     private final Internals internals
 
     ClassFileAnalyzer(JavaClass forClass) {
+        println("CLASS " + forClass.getClassName())
         this.forClass = forClass
         this.internals = new Internals(forClass)
     }

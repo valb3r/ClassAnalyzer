@@ -12,6 +12,7 @@ class CodeRelationships {
         IS_IN,
         RETURNS,
         CALLS,
+        CALLS_LAMBDA,
         EXTENDS,
         IS_A,
         GET,
