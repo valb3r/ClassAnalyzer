@@ -1,6 +1,8 @@
 buildscript {
     ext {
-        versions = [
+        libraries = [
+            dagger: "com.google.dagger:dagger:2.17",
+            daggerCompiler: "com.google.dagger:dagger-compiler:2.17"
         ]
     }
 

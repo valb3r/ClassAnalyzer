@@ -18,3 +18,8 @@ publishPlugin {
 repositories {
     jcenter()
 }
+
+dependencies {
+    implementation libraries.dagger
+    annotationProcessor libraries.daggerCompiler
+}
