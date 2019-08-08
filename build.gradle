@@ -1,0 +1,38 @@
+buildscript {
+    ext {
+        versions = [
+        ]
+    }
+
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+}
+
+group 'org.indirectflow'
+version '0.0.1'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
+
+idea {
+    project {
+        jdkName = JavaVersion.VERSION_1_8
+        languageLevel = JavaVersion.VERSION_1_8
+    }
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+subprojects {
+    tasks.withType(Test) {
+        useJUnitPlatform()
+    }
+}

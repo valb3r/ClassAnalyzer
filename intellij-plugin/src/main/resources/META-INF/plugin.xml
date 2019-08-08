@@ -1,0 +1,44 @@
+<idea-plugin>
+    <id>IndirectFlowPlugin</id>
+    <name>IndirectFlowPlugin</name>
+    <description><![CDATA[
+<h3>Indirect data/call flow analyzer plugin for IntelliJ IDEA</h3>
+<a href="https://github.com/valb3r/ClassAnalyzer/tree/develop">https://github.com/valb3r/ClassAnalyzer</a>
+
+<p>
+With this plugin, you can<br>
++ analyze class relationships based on their indirect calls<br>
++ generate indirect data flow diagram<br>
++ function call diagram (similar to sequence diagram)<br>
+</p>
+]]>
+
+    </description>
+    <version>0.0.1</version>
+    <vendor>https://github.com/valb3r/ClassAnalyzer</vendor>
+    <idea-version since-build="141.1"/>
+
+    <depends>com.intellij.modules.java</depends>
+
+    <change-notes><![CDATA[
+        <dl>
+        <dt>0.0.1</dt>
+        <dd>Initial release of plugin</dd>
+        <dd>Implementing initial plugin POC</dd>
+        </dl>
+    ]]>
+    </change-notes>
+
+    <project-components>
+        <component>
+            <implementation-class>org.indirectflow.intellij.IndirectFlowPlugin</implementation-class>
+            <option name="workspace" value="true"/>
+        </component>
+    </project-components>
+
+    <actions>
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+    </extensions>
+</idea-plugin>

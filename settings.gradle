@@ -1,0 +1,6 @@
+rootProject.name = 'IndirectFlow'
+
+include 'intellij-plugin'
+
+project(":intellij-plugin").projectDir = file("intellij-plugin")
+

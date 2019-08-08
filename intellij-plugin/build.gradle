@@ -1,0 +1,20 @@
+plugins {
+    id "org.jetbrains.intellij" version "0.4.9"
+}
+
+intellij {
+    version '2019.2'
+    pluginName 'IndirectFlowPlugin'
+    plugins = ['java']
+    updateSinceUntilBuild false
+    sandboxDirectory = "${project.rootDir}/.sandbox"
+}
+
+publishPlugin {
+    username "1"
+    password "1"
+}
+
+repositories {
+    jcenter()
+}
