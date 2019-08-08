@@ -1,0 +1,26 @@
+@startuml
+
+skinparam linetype ortho
+
+
+rectangle "BCEL class analyzer" as Ingestor
+cloud Data {
+    database "BCEL node\ngraph" as DB1
+    database "IntelliJ class\nrelationship base" as DB2
+}
+
+rectangle "Class\nrelationship accessor" as Acessor
+rectangle "Random walk analyzer" as Analyzer
+
+cloud UI {
+    rectangle "Visualization\n IntelliJ" as UI1
+    rectangle "Visualization\n REST/frontend" as UI2
+}
+
+Ingestor -down-> DB1
+DB1 -down-> Acessor
+DB2 -down-> Acessor
+Acessor -down-> Analyzer
+Analyzer -down-> UI1
+Analyzer -down-> UI2
+@enduml

@@ -21,6 +21,7 @@ dependencies {
     compile 'commons-io:commons-io:2.6'
     compile 'org.apache.bcel:bcel:6.3.1'
     compile 'org.neo4j:neo4j:3.5.8'
+    compile 'net.sourceforge.plantuml:plantuml:1.2019.8'
 }
 
 task analyzeJars (dependsOn: 'classes', type: JavaExec) {
